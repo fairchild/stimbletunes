@@ -23,15 +23,15 @@ configure do
   )
   # Sequel.connect(ENV['DATABASE_URL'] || 'sqlite://jukebox.db')  
   Settings = OpenStruct.new(
+  
     :title => 'stimbletunes',
     :url_base => 'http://localhost:4567/',
     :admin_password => 's3cr3t',
     :admin_cookie_key => 'stimbly_admin',
     :admin_cookie_value => '51d6d4450976913ace58',
     :music_dns_api_key => '2010d2dbda0c091010f12cf97b5d9839',
-    :music_folders => ['/Users/fairchild/Music/Mogwai'])
-  
-   set :views  => File.join(File.dirname(__FILE__), 'app/views')
+    :music_folders => ['/Users/fairchild/Music/Mogwai'])   
+    set :session => true
 end
 
 configure(:test) do
@@ -46,6 +46,8 @@ configure(:test) do
   set :logging => true
 end
 
+set_option :sessions, true
+
 ## boot.rb
   def require_local_lib(pattern)
     Dir.glob(File.join(File.dirname(__FILE__), pattern)).each {|f| require f }
@@ -56,9 +58,6 @@ end
   load_local_lib('app/models/**/*.rb')
   require_local_lib('lib/**/*.rb')
 ## end boot.rb
-
-set :public, 'public'
-set :views,  'views'
 
 helpers do
   include Rack::Utils
@@ -76,8 +75,8 @@ helpers do
   def song_file_path(folder, filename)
     File.join(current_library, folder, filename)
   end
-  def link_to(name, uri="/#{name}")
-    "<a href=dd\"#{escape uri}\">#{name}</a>"
+  def link_to(name, uri="/#{ escape(name)}")
+    "<a href=\"#{uri}\">#{name}</a>"
   end
   def inspector(thing)
     "<pre>#{pp thing.inspect}</pre>"
@@ -86,5 +85,13 @@ end
 
 get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
+  session[:current_directory]  = current_library
+  haml :index
+end
+
+get '/folders/:folder' do
+  pp "\n *** looking for : #{unescape(params[:folder])}, previously was in #{session.inspect}"
+  pp session
+  @folders = Dir.glob(File.join(current_library, params[:folder], '/*')).collect{|d|  File.basename(d)}
   haml :index
 end
