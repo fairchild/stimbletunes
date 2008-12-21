@@ -1,0 +1,6 @@
+%table
+  %tr
+    %th folder
+  - @folders.each do |folder|
+    %%tr
+      %td= link_to folder, "folders/#{folder}"

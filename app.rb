@@ -2,7 +2,6 @@ require 'rubygems'
 $:.unshift File.join(File.dirname(__FILE__), 'vendor', 'sinatra', 'lib')
 require 'sinatra'
 require File.join(File.dirname(__FILE__), 'lib', 'sinatratunes')
-
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/lib')
 require 'rubygems'
 require 'sinatra'
@@ -12,6 +11,8 @@ require 'activerecord'
 require 'yaml'
 require 'earworm'
 require 'ostruct'
+
+include Rack::Utils
 
 ##### Setup enviornament and stuff ####
 
@@ -60,6 +61,9 @@ set :public, 'public'
 set :views,  'views'
 
 helpers do
+  include Rack::Utils
+  alias_method :h, :escape_html
+  
   def admin?
     request.cookies[Settings.admin_cookie_key] == Settings.admin_cookie_value
   end
@@ -73,17 +77,14 @@ helpers do
     File.join(current_library, folder, filename)
   end
   def link_to(name, uri="/#{name}")
-    "<a href=\"#{uri}\">#{name}</a>"
+    "<a href=dd\"#{escape uri}\">#{name}</a>"
   end
   def inspector(thing)
     "<pre>#{pp thing.inspect}</pre>"
   end
 end
 
-pp Sinatra.options
 get '/' do
-  @directories = Dir.glob(current_library+'/*') - ['.', '.DS_Store']
-  pp Song
-  @songs = Song.all
-  erb :index
+  @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
+  haml :index
 end

@@ -17,6 +17,19 @@ class SinatratuneTest < Test::Unit::TestCase
         assert song.valid?
       end
     end
+    
+    context "Song should " do
+      setup do
+        @song = Song.create({:title => 'Next song'})
+        assert @song.valid?
+      end
+    end
+    
+    should "be able to find from a filename" do
+      Song.find_or_create_from_file
+    end
   end
+  
+  
 
 end
