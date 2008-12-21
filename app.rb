@@ -85,13 +85,18 @@ end
 
 get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
-  session[:current_directory]  = current_library
+  session[:current_directory]  = '/'
+  session[:last_directory]  = '/'
+  
   haml :index
 end
 
-get '/folders/:folder' do
-  pp "\n *** looking for : #{unescape(params[:folder])}, previously was in #{session.inspect}"
-  pp session
-  @folders = Dir.glob(File.join(current_library, params[:folder], '/*')).collect{|d|  File.basename(d)}
+get '/folders/*' do
+  session[:current_directory] = File.join(params['splat'])
+  # 
+  # pp folder
+  # pp "\n *** looking for : #{unescape(folder)}, previously was in #{session.inspect}"
+  # pp session
+  @folders = Dir.glob(File.join(current_library, File.join(params['splat']), '/*')).collect{|d|  File.basename(d)}
   haml :index
 end

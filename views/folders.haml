@@ -1,6 +1,9 @@
+%h1= session[:current_directory]
 %table
   %tr
     %th folder
+  %tr
+    %td= link_to '..', "/folders/#{session[:current_directory]}/.."
   - @folders.each do |folder|
     %%tr
-      %td= link_to folder, "folders/#{escape(folder)}"
+      %td= link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
