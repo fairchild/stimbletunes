@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'redgreen'
 $:.unshift File.join(File.dirname(__FILE__), '..', 'vendor', 'sinatra', 'lib')
 require 'sinatra'
 require 'sinatra/test/unit'
