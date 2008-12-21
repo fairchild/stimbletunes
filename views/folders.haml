@@ -3,7 +3,11 @@
   %tr
     %th folder
   %tr
-    %td= link_to '..', "/folders/#{session[:current_directory]}/.."
+    %td= link_to '../', "/folders/#{session[:current_directory]}/.."
   - @folders.each do |folder|
     %%tr
-      %td= link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
+      %td 
+        - if File.file?(File.join(current_library, session[:current_directory], folder))
+          = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"
+        - else
+          = link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"

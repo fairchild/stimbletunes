@@ -31,7 +31,12 @@ configure do
     :admin_cookie_value => '51d6d4450976913ace58',
     :music_dns_api_key => '2010d2dbda0c091010f12cf97b5d9839',
     :music_folders => ['/Users/fairchild/Music/Mogwai'])   
+    
     set :session => true
+    set :root => File.dirname(__FILE__)
+    set :app_file  => File.join(File.dirname(__FILE__), 'app.rb')
+    # set :views  => File.join(File.dirname(__FILE__), 'app/views')
+    # set_option :sessions, true
 end
 
 configure(:test) do
@@ -39,14 +44,9 @@ configure(:test) do
     :adapter => "sqlite3",
     :database => File.join( File.dirname(__FILE__),"db/jukebox_test.sqlite3" ) 
   )
-  set :root => File.dirname(__FILE__)
-  set :app_file  => File.join(File.dirname(__FILE__), 'app.rb')
-  set :views  => File.join(File.dirname(__FILE__), 'app/views')
   require 'ruby-debug'
   set :logging => true
 end
-
-set_option :sessions, true
 
 ## boot.rb
   def require_local_lib(pattern)
@@ -87,16 +87,15 @@ get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
   session[:current_directory]  = '/'
   session[:last_directory]  = '/'
-  
   haml :index
 end
 
 get '/folders/*' do
   session[:current_directory] = File.join(params['splat'])
-  # 
-  # pp folder
-  # pp "\n *** looking for : #{unescape(folder)}, previously was in #{session.inspect}"
-  # pp session
   @folders = Dir.glob(File.join(current_library, File.join(params['splat']), '/*')).collect{|d|  File.basename(d)}
   haml :index
+end
+
+get '/play/**' do
+  send_file File.join(current_library, File.join(params['splat']))
 end

@@ -12,6 +12,18 @@ class SinatratuneTest < Test::Unit::TestCase
         assert @response.body
       end
       
+      should " be able to stream a file" do
+        get_it '/play/Untitled/another_folder/touched'
+        assert_equal 200, @response.status
+        assert_equal "binary", @response.headers["Content-Transfer-Encoding"]
+      end
+      
+      should "be able to browse a folder" do
+        get_it '/folders/Untitled/'
+        assert_equal 200, @response.status
+        assert @response.body.scan('another_folder')
+      end
+      
       should "be able to create a song" do
         song = Song.create({:title => 'test song'})
         assert song.valid?
@@ -24,9 +36,9 @@ class SinatratuneTest < Test::Unit::TestCase
         assert @song.valid?
       end
     end
-    
+        
     should "be able to find from a filename" do
-      Song.find_or_create_from_file
+     #pending Song.find_or_create_from_file
     end
   end
   
