@@ -7,7 +7,15 @@
   - @folders.each do |folder|
     %%tr
       %td 
-        - if File.file?(File.join(current_library, session[:current_directory], folder))
-          = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"
-        - else
+        - if File.directory?(File.join(current_library, session[:current_directory], folder))
           = link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
+        - elsif  File.file?(File.join(current_library, session[:current_directory], folder))
+          = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"
+          
+/ %ul.graphic
+/   - @folders.each do |folder|
+/     %li
+/       - if File.directory?(File.join(current_library, session[:current_directory], folder))
+/         = link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
+/       - elsif  File.file?(File.join(current_library, session[:current_directory], folder))
+/         = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"

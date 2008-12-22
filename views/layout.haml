@@ -1,7 +1,18 @@
 %html{:xmlns=> "http://www.w3.org/1999/xhtml", 'xml:lang' => "en", :lang => "en"}
   %head
     %meta{'http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8"}
-    %styloe
+    %script{:src=>'/javascripts/jquery.js'}
+    %script{:src=>'/javascripts/soundmanager2.js'}
+    %script{:src=>'/javascripts/inlineplayer.js'}
+    
+    %link{ :href => "/stylesheets/main.css", :rel => "stylesheet", :type => "text/css" }/
+    %link{ :href => "/stylesheet/inlineplayer.css", :rel => "stylesheet", :type => "text/css" }/
+    
+    %script
+      soundManager.url = '/'
+    
     %title sinatratunes
   %body
+    %h4 StimbleTunes
+    %hr
     = yield

@@ -13,9 +13,14 @@ class SinatratuneTest < Test::Unit::TestCase
       end
       
       should " be able to stream a file" do
-        get_it '/play/Untitled/another_folder/touched'
+        get_it '/play/Mogwai/Untitled/another_folder/touched'
         assert_equal 200, @response.status
         assert_equal "binary", @response.headers["Content-Transfer-Encoding"]
+      end
+      
+      should " not be able to stream a file outside of the library" do
+        get_it '/play/../../'
+        assert_equal 401, @response.status
       end
       
       should "be able to browse a folder" do
@@ -23,6 +28,12 @@ class SinatratuneTest < Test::Unit::TestCase
         assert_equal 200, @response.status
         assert @response.body.scan('another_folder')
       end
+      
+      should " not be able to browse a folder outside of the library" do
+        get_it '/folders/../../'
+        assert_equal 401, @response.status
+      end
+      
       
       should "be able to create a song" do
         song = Song.create({:title => 'test song'})

@@ -30,7 +30,7 @@ configure do
     :admin_cookie_key => 'stimbly_admin',
     :admin_cookie_value => '51d6d4450976913ace58',
     :music_dns_api_key => '2010d2dbda0c091010f12cf97b5d9839',
-    :music_folders => ['/Users/fairchild/Music/Mogwai'])   
+    :music_folders => ['/Users/fairchild/Music/'])   
     
     set :session => true
     set :root => File.dirname(__FILE__)
