@@ -1,7 +1,12 @@
+require 'earworm'
+require 'id3lib'
+# require 'flac-info'
+
 class Song < ActiveRecord::Base
   has_many :playlist_songs
   has_many :playlists, :through => :playlist_songs
   
+  validates_uniqueness_of :filename, :scope => [:path]
   def validate
       errors.add("File", "is not a regular file") if !File.file?(full_path)
   end

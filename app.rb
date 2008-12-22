@@ -10,6 +10,7 @@ require 'pp'
 require 'activerecord'
 require 'yaml'
 require 'earworm'
+require 'id3lib'
 require 'ostruct'
 
 include Rack::Utils
@@ -22,6 +23,7 @@ configure do
     :database => File.join(File.dirname(__FILE__),"db/jukebox_ar.sqlite3" )
   )
   ActiveRecord::Base.logger = Logger.new(STDOUT)
+  
   # Sequel.connect(ENV['DATABASE_URL'] || 'sqlite://jukebox.db')  
   Settings = OpenStruct.new(
   
@@ -58,7 +60,6 @@ end
   end
   load_local_lib('app/models/**/*.rb')
   require_local_lib('lib/**/*.rb')
-  Playlist.create if Playlist.count<1
 ## end boot.rb
 
 helpers do
@@ -117,12 +118,13 @@ get '/identify/*' do
   else
     raise "Identify passed an invalid path: #{path}"
   end
+  pp path
   pp @folders
   @songs = @folders.collect do |file_path|
     Song.find_or_create_from_file(file_path) #if !File.file?(file_path)
   end
   @songs = Song.find(:all, :conditions=>["path like ?", path+"%"])
-  pp "songs size = #{pp @songs}"
+  pp "songs size = #{@songs.size}"
   haml :folders
 end
 
@@ -133,6 +135,7 @@ get '/songs/*' do
 end
 
 get '/que/:id' do
+  Playlist.create if Playlist.count<1
   @playlist = Playlist.first
   @song = Song.find params[:id]
   @playlist.songs << @song
@@ -140,7 +143,8 @@ get '/que/:id' do
 end
 
 get '/play/*' do
-  pp params
+  puts " playing #{path = File.join(current_library, File.join(params['splat']))}"
+  pp File.file?(path)
   # if params[:splat].length == 1 #and params[:splat].first.match(/d/)
   #    song = Song.find(params[:splat].pop)
   #    send_file song.full_filename
