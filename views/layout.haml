@@ -13,6 +13,15 @@
     
     %title sinatratunes
   %body
-    %h4 StimbleTunes
+    %a{ :href => '/' } 
+      home |
+    %a{ :href => '/folders/' } 
+      folders |
+    %a{ :href => '/songs/' } 
+      songs |
+    %a{ :href => '/que/' } 
+      que
+  
+    
     %hr
     = yield

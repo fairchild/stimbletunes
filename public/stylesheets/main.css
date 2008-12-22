@@ -1,4 +1,29 @@
+/* @override http://localhost:4567/stylesheets/main.css */
+
 body { 
 font : verdana, tahoma, "Trebuchet MS", arial, sans-serif;
-background : gray;
+background : black;
+color: whitesmoke;
 } 
+
+a{
+	color: #4183c4;
+	text-decoration: none;
+}
+a:hover{
+	text-decoration: underline;
+}
+table{
+	width: 100%;
+	border-bottom: 4px solid gray;
+	padding: 0px;
+	margin: 0px;
+}
+th{
+	height: 5ex;
+}
+td{
+	height: 5ex;
+	margin: 0px;
+	border-top: 1px solid gray;	
+}

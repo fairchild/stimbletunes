@@ -1,17 +1,29 @@
-%h1= session[:current_directory]
+%h1 
+  - session[:current_directory]
+  - dirs = File.split(session[:current_directory]) -['.']
+  - dirs.each_with_index do |d,i| 
+    = link_to "#{d}/", "/folders/#{dirs[0..i].join('/')}"
+  
+ 
 %table
   %tr
-    %th folder
-  %tr
-    %td= link_to '../', "/folders/#{session[:current_directory]}/.."
+    %tr
   - @folders.each do |folder|
+    - path = File.join(session[:current_directory], folder)
+    - next if !File.directory?(library_path(path))
     %%tr
       %td 
-        - if File.directory?(File.join(current_library, session[:current_directory], folder))
-          = link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
-        - elsif  File.file?(File.join(current_library, session[:current_directory], folder))
-          = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"
-          
+        - if File.directory?(library_path(path))
+          = link_to folder, "/folders/#{escape(path)}"
+        -# elsif  File.file?(library_path(path)) #and !%w(mp3 flac ogg aac).include?(File.extname(library_path(path)))
+          =# link_to 'view', "/download/#{escape(path)}"
+          =#link_to folder, "/play/#{escape(path)}"
+        -# else
+          =# (library_path(path))
+
+%p
+  = link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
+
 / %ul.graphic
 /   - @folders.each do |folder|
 /     %li
@@ -19,3 +31,7 @@
 /         = link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
 /       - elsif  File.file?(File.join(current_library, session[:current_directory], folder))
 /         = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"
+%hr
+  
+%p 
+  = haml :songs, :layout=>false if @songs

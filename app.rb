@@ -21,6 +21,7 @@ configure do
     :adapter => "sqlite3",
     :database => File.join(File.dirname(__FILE__),"db/jukebox_ar.sqlite3" )
   )
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
   # Sequel.connect(ENV['DATABASE_URL'] || 'sqlite://jukebox.db')  
   Settings = OpenStruct.new(
   
@@ -57,6 +58,7 @@ end
   end
   load_local_lib('app/models/**/*.rb')
   require_local_lib('lib/**/*.rb')
+  Playlist.create if Playlist.count<1
 ## end boot.rb
 
 helpers do
@@ -81,21 +83,68 @@ helpers do
   def inspector(thing)
     "<pre>#{pp thing.inspect}</pre>"
   end
+  
+  # Retrun a full path for the given file using the current_library
+  def library_path(filename)
+    File.join(current_library, filename)
+  end
 end
 
 get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
   session[:current_directory]  = '/'
-  session[:last_directory]  = '/'
   haml :index
 end
 
 get '/folders/*' do
   session[:current_directory] = File.join(params['splat'])
-  @folders = Dir.glob(File.join(current_library, File.join(params['splat']), '/*')).collect{|d|  File.basename(d)}
-  haml :index
+  @folders = Dir.glob(File.join(current_library, File.join(params['splat']), '/*')).collect{|d|  File.basename(d) if File.directory?(d)}
+  @folders.delete_if{|f| f.nil?}
+  @songs = Song.find(:all, :conditions=>["path like ?", File.join(current_library,session[:current_directory])+"%"])
+  
+  haml :folders
 end
 
-get '/play/**' do
-  send_file File.join(current_library, File.join(params['splat']))
+get '/identify/*' do
+  session[:current_directory] = File.join(params['splat'])
+  path = File.join(current_library, File.join(params['splat']))
+  # Protecect against requests for files that are outside the library
+  raise "Invalid Path: #{path}" if path[0...current_library.length] != current_library
+  if File.file?(path)
+    @folders = [path]
+  elsif File.directory?(path)
+    @folders = Dir.glob(File.join(path, '*'))
+  else
+    raise "Identify passed an invalid path: #{path}"
+  end
+  pp @folders
+  @songs = @folders.collect do |file_path|
+    Song.find_or_create_from_file(file_path) #if !File.file?(file_path)
+  end
+  @songs = Song.find(:all, :conditions=>["path like ?", path+"%"])
+  pp "songs size = #{pp @songs}"
+  haml :folders
+end
+
+get '/songs/*' do
+  session[:current_directory] = File.join(params['splat'])
+  @songs = Song.find(:all, :limit=>200)
+  haml :songs
+end
+
+get '/que/:id' do
+  @playlist = Playlist.first
+  @song = Song.find params[:id]
+  @playlist.songs << @song
+  haml :playlist
+end
+
+get '/play/*' do
+  pp params
+  # if params[:splat].length == 1 #and params[:splat].first.match(/d/)
+  #    song = Song.find(params[:splat].pop)
+  #    send_file song.full_filename
+  if File.file?(File.join(current_library, File.join(params['splat'])) )
+    send_file File.join(current_library, File.join(params['splat']))
+  end
 end
