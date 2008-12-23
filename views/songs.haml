@@ -8,7 +8,7 @@
         %th artist
   - @songs.each do |song|
     %tr
-      %td= link_to '+',  "/que/#{song.id}"
+      %td= link_to '+',  "/playlist/enque/#{song.id}"
       %td= song.track if song.track and song.track!=0
       %td= link_to song.title, "/play/#{escape(session[:current_directory]+"/#{song.filename}")}"
       %td= song.album  rescue '??'

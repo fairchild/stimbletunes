@@ -2,15 +2,15 @@
   %head
     %meta{'http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8"}
     %script{:src=>'/javascripts/jquery.js'}
-    %script{:src=>'/javascripts/soundmanager2.js'}
-    %script{:src=>'/javascripts/inlineplayer.js'}
+    %script{:src=>'/javascripts/soundmanager2-nodebug-jsmin.js'}
+    %script{:src=>'/javascripts/page-player.js'}
+    %script{:src=>'/javascripts/app.js'}
     
     %link{ :href => "/stylesheets/main.css", :rel => "stylesheet", :type => "text/css" }/
-    %link{ :href => "/stylesheet/inlineplayer.css", :rel => "stylesheet", :type => "text/css" }/
+    %link{ :href => "/stylesheet/page-player.css", :rel => "stylesheet", :type => "text/css" }/
     
     %script
-      soundManager.url = '/'
-    
+      
     %title sinatratunes
   %body
     %a{ :href => '/' } 
@@ -19,9 +19,10 @@
       folders |
     %a{ :href => '/songs/' } 
       songs |
-    %a{ :href => '/que/' } 
-      que
+    %a{ :href => '/playlist/' } 
+      playlist
   
     
     %hr
     = yield
+    

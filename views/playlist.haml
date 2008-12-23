@@ -1,3 +1,5 @@
-%ul
+
+
+%ul{:class=>'playlist'}
   - @playlist.songs.each do |song|
     %li= link_to song.title, "/play/#{escape(song.relative_path(current_library))}"

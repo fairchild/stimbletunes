@@ -10,10 +10,10 @@
     %tr
   - @folders.each do |folder|
     - path = File.join(session[:current_directory], folder)
-    - next if !File.directory?(library_path(path))
+    - next if !File.directory?(full_path(path))
     %%tr
       %td 
-        - if File.directory?(library_path(path))
+        - if File.directory?(full_path(path))
           = link_to folder, "/folders/#{escape(path)}"
         -# elsif  File.file?(library_path(path)) #and !%w(mp3 flac ogg aac).include?(File.extname(library_path(path)))
           =# link_to 'view', "/download/#{escape(path)}"

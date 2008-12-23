@@ -7,8 +7,10 @@ class Song < ActiveRecord::Base
   has_many :playlists, :through => :playlist_songs
   
   validates_uniqueness_of :filename, :scope => [:path]
+  validates_presence_of :filename, :message => "can't be blank"
+  
   def validate
-      errors.add("File", "is not a regular file") if !File.file?(full_path)
+      errors.add("File", "is not a regular file: #{full_path}") if !File.file?(full_path)
   end
 
   def Song.earworm
@@ -56,7 +58,7 @@ class Song < ActiveRecord::Base
   end
   
   def relative_path(library_path)
-    path.gsub(library_path, '')
+    File.join(path.gsub(library_path, ''), filename)
   end
   
   def needs_info?
@@ -66,6 +68,12 @@ class Song < ActiveRecord::Base
   def full_path
     return path if filename.nil?
     File.join(path, filename)
+  end
+  
+  def playable?
+    File.file?()
+    #TODO: is this file playable?
+    #TODO: extend to play by open.uri(url)
   end
   
   def to_s
