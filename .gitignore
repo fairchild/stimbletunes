@@ -3,3 +3,4 @@ db/*sqlite?
 log/*
 trash/
 .DS_Store
+/settings.rb

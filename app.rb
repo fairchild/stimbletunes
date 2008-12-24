@@ -87,6 +87,9 @@ helpers do
     #      raise SecurityException, "SECURITY: tried to get file outside of library: #{song_path_within_library}"
     #    end
   end
+  def link_to_song(song)
+    "<a rel=\"/play/#{escape(song.relative_path(current_library))}\" >#{song.title}</a>"
+  end
 end
 
 get '/' do
@@ -138,12 +141,16 @@ get '/playlist/enque/:song_id' do
   Playlist.create if Playlist.count<1
   @playlist = Playlist.first
   @playlist.songs << Song.find(params[:song_id]) if Song.exists?(params[:song_id])
-  haml :playlist
+  if request.xhr?
+    @playlist.songs.size
+  else
+    redirect '/playlist', 303  #use a 303 code to force reset method to GET
+  end
 end
 
-get '/playlist/' do
+get '/playlist' do
   @playlist = Playlist.first
-  haml :playlist
+  haml :playlist, :layout => :playlist_layout
 end
 
 get '/play/*' do

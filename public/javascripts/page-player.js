@@ -40,7 +40,7 @@ function PagePlayer(oConfigOverride) {
     useFavIcon: false       // try to show peakData in address bar (Firefox + Opera)
   }
 
-  sm.debugMode = (window.location.href.toString().match(/debug=1/i)?true:false); // enable with #debug=1 for example
+  sm.debugMode = true //(window.location.href.toString().match(/debug=1/i)?true:false); // enable with #debug=1 for example
 
   this._mergeObjects = function(oMain,oAdd) {
     // non-destructive merge
@@ -1010,5 +1010,5 @@ var pagePlayer = new PagePlayer(typeof PP_CONFIG != 'undefined'?PP_CONFIG:null);
 
 soundManager.onload = function() {
   // soundManager.createSound() etc. may now be called
-  pagePlayer.initDOM();
+  //pagePlayer.initDOM();
 }
