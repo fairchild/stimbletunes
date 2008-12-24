@@ -27,3 +27,13 @@ td{
 	margin: 0px;
 	border-top: 1px solid gray;	
 }
+
+h1.current_folder {
+	background-color: #fff6a9;
+	width: 100%;
+	display: block;
+	margin: 0px;
+	padding: 5px;
+	border-bottom: 3px solid gray;
+}
+

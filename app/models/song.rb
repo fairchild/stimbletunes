@@ -56,6 +56,9 @@ class Song < ActiveRecord::Base
           :year  => tag.year
         }
   end
+  def id3
+    ID3Lib::Tag.new(full_path)
+  end
   
   def relative_path(library_path)
     File.join(path.gsub(library_path, ''), filename)

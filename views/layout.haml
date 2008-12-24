@@ -1,29 +1,28 @@
 %html{:xmlns=> "http://www.w3.org/1999/xhtml", 'xml:lang' => "en", :lang => "en"}
   %head
     %meta{'http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8"}
+    %meta{'http-equiv' => "Content-Type", 'content' => "text/html; charset=utf-8"}
     %script{:src=>'/javascripts/jquery-1.2.6.js'}
     %script{:src=>'/javascripts/soundmanager2.js'}
-    -#%script{:src=>'/javascripts/page-player.js'}
-    %script{:src=>'/javascripts/inlineplayer.js'}
+    %script{:src=>'/javascripts/page-player.js'}
     %script{:src=>'/javascripts/app.js'}
     
     %link{ :href => "/stylesheets/main.css", :rel => "stylesheet", :type => "text/css" }/
-    %link{ :href => "/stylesheet/page-player.css", :rel => "stylesheet", :type => "text/css" }/
+    %link{ :href => "/stylesheets/page-player.css", :rel => "stylesheet", :type => "text/css" }/
     
     %script
       
     %title sinatratunes
   %body
-    %a{ :href => '/' } 
-      home |
-    %a{ :href => '/folders/' } 
-      folders |
-    %a{ :href => '/songs/' } 
-      songs |
-    %a{ :href => '/playlist' } 
-      playlist
-  
-    
-    %hr
+    %div.header
+      %a{ :href => '/' } 
+        home |
+      %a{ :href => '/folders/' } 
+        folders |
+      %a{ :href => '/songs/' } 
+        songs |
+      %a{ :href => '/playlist' } 
+        playlist
+            
     = yield
     

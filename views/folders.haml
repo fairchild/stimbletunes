@@ -1,28 +1,30 @@
-%h1 
+%h1.current_folder
   - session[:current_directory]
   - dirs = File.split(session[:current_directory]) -['.']
   - dirs.each_with_index do |d,i| 
-    = link_to "#{d}/", "/folders/#{dirs[0..i].join('/')}"
+    %span.path_element
+      = link_to "#{d}", "/folders/#{dirs[0..i].join('/')}"
+      = "/"
   
- 
-%table
-  %tr
-    %tr
-  - @folders.each do |folder|
-    - path = File.join(session[:current_directory], folder)
-    - next if !File.directory?(full_path(path))
-    %%tr
-      %td 
-        - if File.directory?(full_path(path))
-          = link_to folder, "/folders/#{escape(path)}"
-        -# elsif  File.file?(library_path(path)) #and !%w(mp3 flac ogg aac).include?(File.extname(library_path(path)))
-          =# link_to 'view', "/download/#{escape(path)}"
-          =#link_to folder, "/play/#{escape(path)}"
-        -# else
-          =# (library_path(path))
 
-%p
-  = link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
+- if !@folders.blank?
+  %table
+    %tr
+      %tr
+    - @folders.each do |folder|
+      - path = File.join(session[:current_directory], folder)
+      - next if !File.directory?(full_path(path))
+      %%tr
+        %td 
+          - if File.directory?(full_path(path))
+            = link_to folder, "/folders/#{escape(path)}"
+          -# elsif  File.file?(library_path(path)) #and !%w(mp3 flac ogg aac).include?(File.extname(library_path(path)))
+            =# link_to 'view', "/download/#{escape(path)}"
+            =#link_to folder, "/play/#{escape(path)}"
+          -# else
+            =# (library_path(path))
+
+= link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
 
 / %ul.graphic
 /   - @folders.each do |folder|
@@ -31,7 +33,7 @@
 /         = link_to folder, "/folders/#{session[:current_directory]}/#{escape(folder)}"
 /       - elsif  File.file?(File.join(current_library, session[:current_directory], folder))
 /         = link_to folder, "/play/#{File.join(session[:current_directory],escape(folder))}"
-%hr
+
+-# haml :songs_table, :layout=>false if @songs
+= haml :songs_list, :layout=>false if @songs
   
-%p 
-  = haml :songs, :layout=>false if @songs

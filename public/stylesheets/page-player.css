@@ -135,8 +135,16 @@ ul.playlist li {
 
 .playlist span.info {
 	font-size: medium;
+ 	display: inline;
+	text-align: right;
+	vertical-align: bottom;
 	float: none;
-	display: inline-block;
+	padding-left: 1ex;
+	color: #fff;
+}
+.playlist li:hover span.info {
+ 	display: inline;
+	color: #4c4c4c;
 }
 
 .playlist span.artist {
@@ -149,7 +157,7 @@ ul.playlist li {
 }
 
 ul.playlist li a {
- display:block;
+ display:inline-block;
  text-decoration:none;
  font-weight:normal;
  color:#000;

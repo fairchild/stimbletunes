@@ -2,21 +2,24 @@ $(document).ready(function() {
   
   soundManager.onload = function() {
     // SM2 is ready to go!
-    soundManager.consoleOnly = true;
+    soundManager.debugMode = true
+    // soundManager.consoleOnly = true;
     soundManager.multiShot = false;
     soundManager.playNext = true;
     
     $(".playlist li ").each(function(i){
         this.id = this.id + "song_" + i;
-         var song_link = $(this).contents('a');
+         var song_link = $(this).find('a');
          // song_link.attr('rel', 'song_'+i);
-         $(this).contents('a').click(function(){});
+         // $(this).contents('a').click(function(){});
         
          $(this).click(function(){
-           soundManager.stopAll();
+           // soundManager.stopAll();
            $(".playlist li ").each(function(){$(this).removeClass('sm2_playing');});
+           console.log('sadfsdf')
            
            console.debug( song_link.attr('rel') );
+           console.log('ff')
            $(this).addClass('sm2_playing');
            var mySound = soundManager.createSound({
              id: 'song_'+i,
@@ -24,6 +27,7 @@ $(document).ready(function() {
              volume: 95
            });
            mySound.play();
+           
          });
          // song_link.bind('click', function () {console.log('clicked a linke'); return false });
          

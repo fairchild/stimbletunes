@@ -1,6 +1,8 @@
-%ul{:class=>'playlist'}
-  - @playlist.songs.each do |song|
-    %li 
+
+%ul{:class=>'playlist songs_list'}
+  - @songs.each do |song|
+    %li
+      
       %span.song= link_to_song song
       %span.info
         %span.artist= song.artist
