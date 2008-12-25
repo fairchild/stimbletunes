@@ -5,7 +5,8 @@
     %span.path_element
       = link_to "#{d}", "/folders/#{dirs[0..i].join('/')}"
       = "/"
-  
+%div.scan_folder= link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
+
 
 - if !@folders.blank?
   %table
@@ -24,7 +25,6 @@
           -# else
             =# (library_path(path))
 
-= link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
 
 / %ul.graphic
 /   - @folders.each do |folder|

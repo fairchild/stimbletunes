@@ -14,13 +14,21 @@ a:hover{
 	text-decoration: underline;
 }
 table{
-	width: 100%;
-	border-bottom: 4px solid gray;
+	border-bottom: 2px solid gray;
 	padding: 0px;
 	margin: 0px;
 }
 th{
 	height: 5ex;
+}
+
+span.path_element {
+	margin-right: .5ex;
+}
+
+div.scan_folder {
+	background-color: #fff6a9;
+	border-bottom: 1px dotted gray;
 }
 td{
 	height: 5ex;
@@ -30,10 +38,10 @@ td{
 
 h1.current_folder {
 	background-color: #fff6a9;
-	width: 100%;
+	/*width: 98%;*/
 	display: block;
 	margin: 0px;
 	padding: 5px;
-	border-bottom: 3px solid gray;
+	border-bottom: 1px dotted gray;
 }
 
