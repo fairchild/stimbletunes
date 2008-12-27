@@ -100,8 +100,10 @@ helpers do
 end
 
 before  do
-  puts "\n----------"
-  pp session.to_yaml
+  puts "\n---------- session = "
+  pp session
+  puts "----------\n"
+  
 end
 
 get '/' do
@@ -133,11 +135,11 @@ get '/identify/*' do
   else
     raise "Identify passed an invalid path: #{path}"
   end
-  @songs = @folders.collect do |file_path|
-    Song.find_or_create_from_file(file_path) #if !File.file?(file_path)
+  @folders.each do |file_path|
+    puts "file = #{file_path}"
+    Song.find_or_create_from_file(file_path) if File.file?(file_path)
   end
   @songs = Song.find(:all, :conditions=>["path like ?", path+"%"])
-  pp "songs size = #{@songs.size}"
   haml :folders
 end
 

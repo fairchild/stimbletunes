@@ -1,9 +1,10 @@
 %h1.current_folder
   - session[:current_directory]
-  - dirs = File.split(session[:current_directory]) -['.']
+  - dirs = (session[:current_directory]).split('/') - ['']
+  = '/'
   - dirs.each_with_index do |d,i| 
     %span.path_element
-      = link_to "#{d}", "/folders/#{dirs[0..i].join('/')}"
+      = link_to "#{d} ", "/folders/#{dirs[0..i].join('/')}"
       = "/"
 %div.scan_folder= link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
 
