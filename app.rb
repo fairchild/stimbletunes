@@ -95,15 +95,14 @@ helpers do
     #    end
   end
   def link_to_song(song)
-    "<a rel=\"/play/#{escape(song.relative_path(current_library))}\" >#{song.title}</a>"
+    "<a rel=\"/play/#{escape(song.relative_path(current_library))}\" >#{song}</a>"
   end
 end
 
 before  do
-  puts "\n---------- session = "
-  pp session
-  puts "----------\n"
-  
+  # puts "\n---------- session = "
+  # pp session
+  # puts "----------\n"  
 end
 
 get '/' do
@@ -114,12 +113,11 @@ end
 
 get '/folders/*' do
   folder_path = File.join(params['splat'])
-  # raise InvalidFile, "Tried to play an invalid file: #{folder_path}" if !File.file?(full_path(folder_path))
+  # raise InvalidFile, "Tried to display an invalid folder: #{folder_path}" if !File.exists?(full_path(folder_path))
   session[:current_directory] = File.join(params['splat'])
   @folders = Dir.glob(File.join(current_library, File.join(params['splat']), '/*')).collect{|d|  File.basename(d) if File.directory?(d)}
   @folders.delete_if{|f| f.nil?}
   @songs = Song.find(:all, :conditions=>["path like ?", File.join(current_library, session[:current_directory]) ])
-  
   haml :folders
 end
 
@@ -136,7 +134,7 @@ get '/identify/*' do
     raise "Identify passed an invalid path: #{path}"
   end
   @folders.each do |file_path|
-    puts "file = #{file_path}"
+    puts "file = #{file_path}" if File.file?(file_path)
     Song.find_or_create_from_file(file_path) if File.file?(file_path)
   end
   @songs = Song.find(:all, :conditions=>["path like ?", path+"%"])
@@ -151,7 +149,7 @@ end
 
 get '/playlist/enque/:song_id' do
   Playlist.create if Playlist.count<1
-  @playlist = Playlist.first
+  @playlist = session[:current_playlist] || Playlist.first
   @playlist.songs << Song.find(params[:song_id]) if Song.exists?(params[:song_id])
   if request.xhr?
     @playlist.songs.size
@@ -159,10 +157,22 @@ get '/playlist/enque/:song_id' do
     redirect '/playlist', 303  #use a 303 code to force reset method to GET
   end
 end
+get '/playlist/remove/:playlist_song_id' do
+  pp request
+  @playlist = session[:current_playlist] || Playlist.first
+  @playlist.songs.delete(@playlist.songs.find(params[:playlist_song_id]))
+  if request.xhr?
+    @playlist.songs.size
+    puts "it was xhr"
+  else
+    puts "file removed, not thru ajax"
+    # redirect '/playlist'  #use a 303 code to force reset method to GET
+  end
+end
 
 get '/playlist' do
   @playlist = Playlist.first
-  haml :playlist, :layout => :playlist_layout
+  haml :playlist # :layout => :playlist_layout
 end
 
 get '/libraries/*' do

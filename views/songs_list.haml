@@ -2,7 +2,12 @@
 %ul{:class=>'playlist songs_list'}
   - @songs.each do |song|
     %li
-      %span.song= link_to_song song
+      %span.control_icons
+        %a{:href=>"/playlist/enque/#{song.id}"} +
+      %span.song
+        = link_to_song song        
       %span.info
         %span.artist= song.artist
         %span.album= song.album
+      %span.position
+      %span.duration

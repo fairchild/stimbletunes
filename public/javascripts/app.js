@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  $('.playlist').before("<span id='currently_playing'></span>");
+  $('.playlist').before("<span id='next_song'></span>");
   
   soundManager.onload = function() {
     console.log('soundManager.onload has begun');
@@ -8,9 +10,35 @@ $(document).ready(function() {
     soundManager.multiShot = false;
     soundManager.playNext = true;
     
-    play_next_song = function(index){ };  //TODO
+    function play_song(index){ 
+      var current_song = soundManager.getSoundById('song_'+index);
+      
+      
+      var jq_song = $(".playlist li:eq(" +index+ ")");
+      // current_song.load();
+      $(".playlist li.sm2_playing").each(function(){$(this).removeClass('sm2_playing');});
+      $('#currently_playing').html('song'+index);
+      $('#next_song').html('song_'+(index+1));
+      // console.log("song: %s = %s", current_song.sID,  $('#next_song').html() );
+      
+      jq_song.addClass('sm2_playing');
+      // current_song.options.onload(function(){jq_song.find('.duration').html(this.duration);})
+      
+      // current_song.options.whileplaying(function(){
+      //   // $(".playlist li:eq(" +index+ ").playing").html(this.position);
+      //   // $(".playlist li:eq(" +index+ ").duration").html(this.duration);
+      //   console.log(this.position);
+      // });
+      
+      soundManager.play('song_'+index);
+      // current_song.play();
+      // soundManager.load('song_'+(index+1));  //preload the next song
+      console.log('playing song.');
+    };
     
+        
     $(".playlist li ").each(function(i){
+      console.log("this is: %s", this );
         this.id = this.id + "song_" + i;
          var song_link = $(this).find('a');
          var song_url = song_link.attr('rel');
@@ -19,21 +47,22 @@ $(document).ready(function() {
          
          //iterate thru playlist, creating soundManager objects for all playable links
          if (soundManager.canPlayURL( song_url) ) {          
-            var mySound = soundManager.createSound({
+            soundManager.createSound({
               id: 'song_'+i,
               url: song_link.attr('rel'),
               volume: 95,
               playNext: true,
               consoleOnly: true,
-              // onfinish: play_next_song(i);  TODO: encapuslate following code in a function
-              onfinish: function() {
-                  soundManager.play('song_'+i+1);
-                  consoloe.debug("done playing song");
-                  $(this).removeClass('sm2_playing');
-                }
+              onfinish:function() {
+                 console.log(this.sID+' finished playing');
+                 play_song(i+1);
+                 soundManager.play('song_'+(i+1));
+               }
+               // whileplaying: function() {                 
+               //   // console.log('timing' + this.position+' / '+this.duration);
+               // }
+               
             });
-            console.debug("created song_"+i);
-            // mySound.play();
           };
           
         
@@ -43,31 +72,29 @@ $(document).ready(function() {
            if ($(this).attr('class') == 'sm2_playing'){ 
              soundManager.pause('song_'+i);
              $(".playlist li.sm2_playing").each(function(){$(this).removeClass('sm2_playing');});
-             $(this).addClass('sm2_paused');
+             $(".playlist li.sm2_paused").each(function(){$(this).removeClass('sm2_playing');});
              
+             $(this).addClass('sm2_paused');
              console.debug($(this).attr('class')+' :pause song_'+i);
            }else {
-              console.debug(i+'-----'+$(this).html());
+              // console.debug(i+'-----'+$(this).next().html());
               $(this).removeClass('sm2_paused');
-              $(this).addClass('sm2_playing');
-              soundManager.play('song_'+i);
+              play_song(i);
               console.debug( song_link.html() );
            };
           });
   
          });
-         // song_link.bind('click', function () {console.log('clicked a linke'); return false });
-         
-        
-      
-    
-  //   var mySound = soundManager.createSound({
-  //     id: 'aSound',
-  //     url: 'http://localhost:4567/play/schiller%2FEightrack+Mind%2FHardly+Human%2F10+-+Sacrifice.mp3',
-  //     volume: 90
-  //   });
-  //   mySound;
   };
+  
+  
+  // playlist behavior
+  // $('.playlist_remove').click(function(){
+  //   console.log("removing a song: %s", $(this).html());
+  //   $.get($(this).attr('href'),'', function(){ $(this).hide('slow'); } );
+  // });
+  
+  
 
 });
 

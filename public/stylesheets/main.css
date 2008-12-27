@@ -45,3 +45,13 @@ h1.current_folder {
 	border-bottom: 1px dotted gray;
 }
 
+
+
+
+.playlist li .control_icons {
+	display: none;
+}
+.playlist li:hover .control_icons {
+ 	display: inline-block;
+	color: #4c4c4c;
+}

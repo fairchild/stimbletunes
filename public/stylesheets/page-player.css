@@ -142,7 +142,7 @@ ul.playlist li {
 	padding-left: 1ex;
 	color: #fff;
 }
-.playlist li:hover span.info {
+.playlist li:hover .info {
  	display: inline;
 	color: #4c4c4c;
 }
