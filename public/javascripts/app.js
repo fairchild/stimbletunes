@@ -12,8 +12,6 @@ $(document).ready(function() {
     
     function play_song(index){ 
       var current_song = soundManager.getSoundById('song_'+index);
-      
-      
       var jq_song = $(".playlist li:eq(" +index+ ")");
       // current_song.load();
       $(".playlist li.sm2_playing").each(function(){$(this).removeClass('sm2_playing');});
@@ -23,7 +21,6 @@ $(document).ready(function() {
       
       jq_song.addClass('sm2_playing');
       // current_song.options.onload(function(){jq_song.find('.duration').html(this.duration);})
-      
       // current_song.options.whileplaying(function(){
       //   // $(".playlist li:eq(" +index+ ").playing").html(this.position);
       //   // $(".playlist li:eq(" +index+ ").duration").html(this.duration);
@@ -38,8 +35,7 @@ $(document).ready(function() {
     
         
     $(".playlist li ").each(function(i){
-      console.log("this is: %s", this );
-        this.id = this.id + "song_" + i;
+         this.id = this.id + "song_" + i;
          var song_link = $(this).find('a');
          var song_url = song_link.attr('rel');
          // song_link.attr('rel', 'song_'+i);

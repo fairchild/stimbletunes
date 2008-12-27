@@ -2,7 +2,7 @@
   - @playlist.songs.each do |song|
     %li
       %span.control_icons
-        %a{:href=>"/playlist/remove/#{song.id}", :class=>"playlist_remove"} -
+        %a{:rel=>"/playlist/remove/#{song.id}", :class=>"playlist_remove"} -
       %span.song= link_to_song song
       %span.info
         %span.artist= song.artist
