@@ -22,7 +22,14 @@
       %a{ :href => '/songs/' } 
         songs |
       %a{ :href => '/playlist' } 
-        playlist
+        playlist |
+      %a{ :href => '/libraries/' } 
+        libraries | 
+      %span{:id => 'current_library'}= session[:current_library]
             
     = yield
+
+%div
+  %pre
+    = session.to_yaml
     

@@ -27,11 +27,10 @@ configure do
   
   # Sequel.connect(ENV['DATABASE_URL'] || 'sqlite://jukebox.db')  
   
-  set :session => true
+  set :sessions => true
   set :root => File.dirname(__FILE__)
   set :app_file  => File.join(File.dirname(__FILE__), 'app.rb')
   # set :views  => File.join(File.dirname(__FILE__), 'app/views')
-  # set_option :sessions, true
 end
 
 configure(:test) do
@@ -68,8 +67,16 @@ helpers do
     stop [ 401, 'Not authorized' ] unless true or admin?
   end
   def current_library
-    Settings.music_folders.first
+    session[:current_library] || Settings.music_folders.last
   end
+  # def current_library=(media_folder)
+  #   if true or Settings.music_folders.inlcude?(media_folder)
+  #     session[:current_library] = media_folder
+  #     puts "current library #{media_folder} | #{session[:current_library]}"
+  #   else
+  #     raise SecurityException, "Tried to set library to a path not included in the Settings"
+  #   end
+  # end
   def song_file_path(folder, filename)
     File.join(current_library, folder, filename)
   end
@@ -90,6 +97,11 @@ helpers do
   def link_to_song(song)
     "<a rel=\"/play/#{escape(song.relative_path(current_library))}\" >#{song.title}</a>"
   end
+end
+
+before  do
+  puts "\n----------"
+  pp session.to_yaml
 end
 
 get '/' do
@@ -113,7 +125,7 @@ get '/identify/*' do
   session[:current_directory] = File.join(params['splat'])
   path = File.join(current_library, File.join(params['splat']))
   # Protecect against requests for files that are outside the library
-  raise "Invalid Path: #{path}" if path[0...current_library.length] != current_library
+  raise SecurityException, "Invalid Path: #{path}" if (path[0...current_library.length] != current_library)
   if File.file?(path)
     @folders = [path]
   elsif File.directory?(path)
@@ -121,8 +133,6 @@ get '/identify/*' do
   else
     raise "Identify passed an invalid path: #{path}"
   end
-  pp path
-  pp @folders
   @songs = @folders.collect do |file_path|
     Song.find_or_create_from_file(file_path) #if !File.file?(file_path)
   end
@@ -134,7 +144,7 @@ end
 get '/songs/*' do
   session[:current_directory] = File.join(params['splat'])
   @songs = Song.find(:all, :limit=>200)
-  haml :songs
+  haml :folders
 end
 
 get '/playlist/enque/:song_id' do
@@ -151,6 +161,21 @@ end
 get '/playlist' do
   @playlist = Playlist.first
   haml :playlist, :layout => :playlist_layout
+end
+
+get '/libraries/*' do
+  new_media_library = File.join('/', params[:splat])
+  if params['splat'].first != ''
+    puts "changing current_library from #{current_library}"
+    # current_library = File.join('/', params[:splat])  #TODO why does this fail?
+    if Settings.music_folders.include?(new_media_library)
+      session[:current_library] = File.join('/', params[:splat])
+    else
+      raise SecurityException, "tried to change current_library to directory outside of settings: #{File.join('/', params[:splat])}"
+    end
+  end
+  @libraries = Settings.music_folders
+  haml :libraries
 end
 
 get '/play/*' do

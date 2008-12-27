@@ -8,6 +8,7 @@ class Song < ActiveRecord::Base
   
   validates_uniqueness_of :filename, :scope => [:path]
   validates_presence_of :filename, :message => "can't be blank"
+  validates_length_of :path, :within => 2..255
   
   def validate
       errors.add("File", "is not a regular file: #{full_path}") if !File.file?(full_path)

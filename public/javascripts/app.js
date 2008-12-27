@@ -25,11 +25,14 @@ $(document).ready(function() {
               volume: 95,
               playNext: true,
               consoleOnly: true,
-              // onfinish: play_next_song(i);
+              // onfinish: play_next_song(i);  TODO: encapuslate following code in a function
               onfinish: function() {
                   soundManager.play('song_'+i+1);
+                  consoloe.debug("done playing song");
+                  $(this).removeClass('sm2_playing');
                 }
             });
+            console.debug("created song_"+i);
             // mySound.play();
           };
           
