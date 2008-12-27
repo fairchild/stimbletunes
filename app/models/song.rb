@@ -1,6 +1,7 @@
 require 'earworm'
 require 'id3lib'
 require 'flacinfo'
+require 'MP4Info'
 
 class Song < ActiveRecord::Base
   has_many :playlist_songs
@@ -31,7 +32,9 @@ class Song < ActiveRecord::Base
      when 'flac'
        song.update_attributes(song.parse_flac)
      when 'ogg'
+       song.update_attributes(song.parse_ogg)
      when 'wav'
+       song.update_attributes(song.earworm)
      # when 'aif'
      # when 'mp4'
      # when 'wma'
@@ -57,6 +60,19 @@ class Song < ActiveRecord::Base
     end
   end
   
+  def parse_ogg
+        ogg = OggInfo.new(full_path)
+        return {} if !ogg.hastag?
+        {
+          :artist => ogg.tag.artist,
+          :title  => ogg.tag.title,
+          :album  => ogg.tag.album,
+          :track  => ogg.tag.track, #[/^(\d+)/]
+          :genre  => ogg.tag.genre,
+          :year   => ogg.tag.year
+        }
+  end
+    
   def parse_id3
         # require 'id3lib'
         tag = ID3Lib::Tag.new(full_path)
