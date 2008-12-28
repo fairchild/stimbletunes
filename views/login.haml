@@ -1,0 +1,6 @@
+%h2 Login
+%form{ :action => "/login", :method => "post" }
+  %input{ :name => "password", :type => "password" }/
+  %input{ :type => "submit", :value => "Login" }/
+%script{ :type => "text/javascript" }
+  document.forms[0].password.focus()

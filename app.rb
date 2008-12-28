@@ -7,12 +7,15 @@ require 'sequel'
 require 'pp'
 require 'activerecord'
 require 'yaml'
-require 'earworm'
-require 'id3lib'
 require 'ostruct'
 require File.join(File.dirname(__FILE__), 'lib', 'sinatratunes')
 require 'exceptions'
+
 include Rack::Utils
+
+use Rack::Auth::Basic do |username, password|
+  username == 'admin' && password == 'secret'
+end
 
 ##### Setup enviornament and stuff ####
 configure do
@@ -63,19 +66,11 @@ helpers do
     request.cookies[Settings.admin_cookie_key] == Settings.admin_cookie_value
   end
   def auth
-    stop [ 401, 'Not authorized' ] unless true or admin?
+    stop [ 401, 'Not authorized' ] unless admin?
   end
   def current_library
     session[:current_library] || Settings.music_folders.last
   end
-  # def current_library=(media_folder)
-  #   if true or Settings.music_folders.inlcude?(media_folder)
-  #     session[:current_library] = media_folder
-  #     puts "current library #{media_folder} | #{session[:current_library]}"
-  #   else
-  #     raise SecurityException, "Tried to set library to a path not included in the Settings"
-  #   end
-  # end
   def song_file_path(folder, filename)
     File.join(current_library, folder, filename)
   end
@@ -85,29 +80,30 @@ helpers do
   def inspector(thing)
     "<pre>#{pp thing.inspect}</pre>"
   end
-  # Return a full path for the given file using the current_library
-  # Throw an exception if full_path is requested for a path outside the library (i.e. ../../..)
-  # def full_path(song_path_within_library)
-  #   expanded_path = File.expand_path(File.join(current_library, song_path_within_library))
-  #   # if !File.split(expanded_path).shift.include?(current_library)
-  #   #      raise SecurityException, "SECURITY: tried to get file outside of library: #{song_path_within_library}"
-  #   #    end
-  # end
   def link_to_song(song)
     "<a rel=\"/play/#{escape(song.full_path)}\" >#{song}</a>"
   end
 end
 
 before  do
-  # puts "\n---------- session = "
-  # pp session
-  # puts "----------\n"  
 end
 
 get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
   session[:current_directory]  = '/'
   haml :index
+end
+
+get '/login' do
+  haml :login
+end
+post '/login' do
+  set_cookie(Settings.admin_cookie_key, Settings.admin_cookie_value) if params[:password] == Settings.admin_password
+	redirect '/'	
+end
+get '/logout' do
+  request.cookies[Settings.admin_cookie_key] = nil
+	redirect '/login'	
 end
 
 get '/folders/*' do
@@ -121,7 +117,7 @@ get '/folders/*' do
   haml :folders
 end
 
-get '/identify/*' do
+get '/identify/*' do  
   session[:current_directory] = File.join(params['splat'])
   path = File.join(current_library, File.join(params['splat']))
   # Protecect against requests for files that are outside the library
@@ -191,12 +187,11 @@ get '/libraries/*' do
 end
 
 get '/play/*' do
-  pp params
   song = Song.find_by_full_path( File.join(params['splat']) )
+  song.increment_play_count
   # play_path = full_path( File.join(params['splat']) )
   return false if song.blank?
   raise InvalidFile, "Tried to play an invalid file: #{song.full_path}" if !File.file?(song.full_path)
-  pp song.full_path
   puts " -> playing: #{song.full_path} ->\n"  
   # if params[:splat].length == 1 #and params[:splat].first.match(/d/)
   #    song = Song.find(params[:splat].pop)

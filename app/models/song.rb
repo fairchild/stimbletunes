@@ -29,7 +29,6 @@ class Song < ActiveRecord::Base
                        :format =>File.extname(file_path).downcase.gsub(/^\./, '') } )
     end
     if song.new_record? or update_metadata
-      # puts "\n\n\n\n\n\n song: #{song.inspect}\n------------------"
      case song.format
      when 'mp3'
        tags = song.parse_id3
