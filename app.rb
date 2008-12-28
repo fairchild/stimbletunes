@@ -43,7 +43,6 @@ configure(:test) do
   File.join(File.dirname(__FILE__), 'fixtures', 'Music')
   require 'ruby-debug'
   set :logging => true
-  # Settings.music_folders = [File.join(File.dirname(__FILE__), 'test', 'fixtures', 'Music')]
 end
 
 ## boot.rb
@@ -88,14 +87,14 @@ helpers do
   end
   # Return a full path for the given file using the current_library
   # Throw an exception if full_path is requested for a path outside the library (i.e. ../../..)
-  def full_path(song_path_within_library)
-    expanded_path = File.expand_path(File.join(current_library, song_path_within_library))
-    # if !File.split(expanded_path).shift.include?(current_library)
-    #      raise SecurityException, "SECURITY: tried to get file outside of library: #{song_path_within_library}"
-    #    end
-  end
+  # def full_path(song_path_within_library)
+  #   expanded_path = File.expand_path(File.join(current_library, song_path_within_library))
+  #   # if !File.split(expanded_path).shift.include?(current_library)
+  #   #      raise SecurityException, "SECURITY: tried to get file outside of library: #{song_path_within_library}"
+  #   #    end
+  # end
   def link_to_song(song)
-    "<a rel=\"/play/#{escape(song.relative_path(current_library))}\" >#{song}</a>"
+    "<a rel=\"/play/#{escape(song.full_path)}\" >#{song}</a>"
   end
 end
 
@@ -115,8 +114,9 @@ get '/folders/*' do
   folder_path = File.join(params['splat'])
   # raise InvalidFile, "Tried to display an invalid folder: #{folder_path}" if !File.exists?(full_path(folder_path))
   session[:current_directory] = File.join(params['splat'])
-  @folders = Dir.glob(File.join(current_library, File.join(params['splat']), '/*')).collect{|d|  File.basename(d) if File.directory?(d)}
+  @folders = Dir.glob(File.join(current_library, File.join(folder_path, '/*'))).collect{|d|  File.basename(d) if File.directory?(d)}
   @folders.delete_if{|f| f.nil?}
+  pp @folders 
   @songs = Song.find(:all, :conditions=>["path like ?", File.join(current_library, session[:current_directory]) ])
   haml :folders
 end
@@ -131,13 +131,13 @@ get '/identify/*' do
   elsif File.directory?(path)
     @folders = Dir.glob(File.join(path, '*'))
   else
-    raise "Identify passed an invalid path: #{path}"
+    raise "passed an invalid path: #{path}"
   end
   @folders.each do |file_path|
     puts "file = #{file_path}" if File.file?(file_path)
-    Song.find_or_create_from_file(file_path) if File.file?(file_path)
+    Song.find_or_create_from_file(file_path, true) if File.file?(file_path)
   end
-  @songs = Song.find(:all, :conditions=>["path like ?", path+"%"])
+  @songs = Song.find(:all, :limit=>50, :conditions=>["path like ?", path+"%"])
   haml :folders
 end
 
@@ -191,11 +191,15 @@ get '/libraries/*' do
 end
 
 get '/play/*' do
-  play_path = full_path( File.join(params['splat']) )
-  puts " playing: #{play_path} |"  
-  raise InvalidFile, "Tried to play an invalid file: #{play_path}" if !File.file?(play_path)
+  pp params
+  song = Song.find_by_full_path( File.join(params['splat']) )
+  # play_path = full_path( File.join(params['splat']) )
+  return false if song.blank?
+  raise InvalidFile, "Tried to play an invalid file: #{song.full_path}" if !File.file?(song.full_path)
+  pp song.full_path
+  puts " -> playing: #{song.full_path} ->\n"  
   # if params[:splat].length == 1 #and params[:splat].first.match(/d/)
   #    song = Song.find(params[:splat].pop)
   #    send_file song.full_filename
-  send_file play_path
+  send_file song.full_path
 end

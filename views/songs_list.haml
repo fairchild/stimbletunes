@@ -1,10 +1,10 @@
 
 %ul{:class=>'playlist songs_list'}
-  - @songs.each do |song|
+  - @songs.each_with_index do |song, i|
     %li
       %span.control_icons
         %span{:rel=>"/playlist/enque/#{song.id}"} +
-      %span.song
+      %span{:class=>"playable song", :id=>"song_#{i}"}
         = link_to_song song        
       %span.info
         %span.artist= song.artist

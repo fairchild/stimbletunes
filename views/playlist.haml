@@ -3,7 +3,7 @@
     %li
       %span.control_icons
         %a{:rel=>"/playlist/remove/#{song.id}", :class=>"playlist_remove"} -
-      %span.song= link_to_song song
+      %span{:class=>"playable song"}= link_to_song song
       %span.info
         %span.artist= song.artist
         %span.album= song.album

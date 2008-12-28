@@ -13,22 +13,29 @@ class Song < ActiveRecord::Base
   # def validate
   #     errors.add("File", "is not a regular file: #{full_path}") if !File.file?(full_path)
   # end
-
-  def Song.earworm
-    @ew = Earworm::Client.new(Settings.music_dns_api_key)
+  def Song.find_by_full_path(given_path)
+    folder = File.dirname(given_path)
+    basename = File.basename(given_path)
+    Song.find(:first, :conditions=>["path=? AND filename=?", folder, basename])
   end
   
-  def Song.find_or_create_from_file(file_path)
+  def Song.find_or_create_from_file(file_path, update_metadata=false)
     return nil if !File.file?(file_path)
     song = Song.find(:first, :conditions => {:filename=>File.basename(file_path), 
                                              :path => file_path.gsub("/#{File.basename(file_path)}",'')})
-    if song.blank? or song.needs_info?
+    if song.blank?
       song = Song.new({:filename=>File.basename(file_path), 
                        :path => file_path.gsub("/#{File.basename(file_path)}",''),
                        :format =>File.extname(file_path).downcase.gsub(/^\./, '') } )
+    end
+    if song.new_record? or update_metadata
+      # puts "\n\n\n\n\n\n song: #{song.inspect}\n------------------"
      case song.format
      when 'mp3'
-       song.update_attributes(song.parse_id3) 
+       tags = song.parse_id3
+       pp tags
+       song.update_attributes(tags)
+       pp "it was an mp3\n\n"
      when 'flac'
        song.update_attributes(song.parse_flac)
      when 'ogg'
@@ -46,15 +53,20 @@ class Song < ActiveRecord::Base
     end
   end
 
+  def Song.earworm
+    @ew = Earworm::Client.new(Settings.music_dns_api_key)
+  end
   def earworm
+    @ear = @ear || Song.earworm.identify( :file => self.full_path )
+  end
+  def earworm_tags
     begin
-      ear = Song.earworm.identify( :file => self.full_path )
+      ear = earworm
       pp ear
       { :artist   => ear.artist_name, 
         :title    => ear.title, 
         :metadata => ear.to_yaml,
-        :muisc_dnsed_at => Time.now
-      }
+        :muisc_dnsed_at => Time.now }
     rescue  
       {}
     end
@@ -109,7 +121,7 @@ class Song < ActiveRecord::Base
   end
   
   def needs_info?
-    !(artist && title && album && year && length && format)
+    (artist.blank? || title.blank? || album.blank? || year.blank? || length.blank? || format.blank?)
   end
     
   def full_path
