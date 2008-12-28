@@ -1,5 +1,4 @@
 %h1.current_folder
-  - session[:current_directory]
   - dirs = (session[:current_directory]).split('/') - ['']
   = '/'
   - dirs.each_with_index do |d,i| 
@@ -14,10 +13,10 @@
       %tr
     - @folders.each do |folder|
       - path = File.join(session[:current_directory], folder)
-      - next if !File.directory?(File.join(session[:current_library], path))
+      - next if !File.directory?(File.join(current_library, path))
       %%tr
         %td 
-          - if File.directory?(File.join(session[:current_library], path))
+          - if File.directory?(File.join(current_library, path))
             = link_to folder, "/folders/#{escape(path)}"
           -# elsif  File.file?(library_path(path)) #and !%w(mp3 flac ogg aac).include?(File.extname(library_path(path)))
             =# link_to 'view', "/download/#{escape(path)}"

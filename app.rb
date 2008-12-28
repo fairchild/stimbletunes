@@ -85,13 +85,12 @@ helpers do
   end
 end
 
-before  do
-end
+
 
 get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
   session[:current_directory]  = '/'
-  haml :index
+  haml :folders
 end
 
 get '/login' do
@@ -189,11 +188,10 @@ end
 get '/play/*' do
   song = Song.find_by_full_path( File.join(params['splat']) )
   song.increment_play_count
-  # play_path = full_path( File.join(params['splat']) )
   return false if song.blank?
   raise InvalidFile, "Tried to play an invalid file: #{song.full_path}" if !File.file?(song.full_path)
   puts " -> playing: #{song.full_path} ->\n"  
-  # if params[:splat].length == 1 #and params[:splat].first.match(/d/)
+  # if params[:splat].first.match(/d/)
   #    song = Song.find(params[:splat].pop)
   #    send_file song.full_filename
   send_file song.full_path
