@@ -1,6 +1,4 @@
 $(document).ready(function() {
-  $('.playlist').before("<span id='currently_playing'></span>");
-  $('.playlist').before("<span id='next_song'></span>");
   
   soundManager.onload = function() {
     console.log(' -- soundManager.onload has begun --');

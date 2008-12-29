@@ -6,7 +6,14 @@
       = link_to "#{d} ", "/folders/#{dirs[0..i].join('/')}"
       = "/"
 %div.scan_folder= link_to 'scan folder', "/identify/#{escape(session[:current_directory])}"
-
+%div{:id=>'control_pane'}
+  %div{:id=>"play_pause_button", :class=>'paused'} play
+  %div{:id=>"currently_playing"} currently playing song
+  %div{:id=>"volume"} volume
+  %div{:id=>'position'} position
+  %div{:id=>'duration'} duration
+  
+  
 - if !@folders.blank?
   %table
     %tr

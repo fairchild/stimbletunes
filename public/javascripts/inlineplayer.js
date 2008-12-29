@@ -75,8 +75,9 @@ function InlinePlayer() {
       this._data.className = pl.css.sPlaying;
       pl.addClass(this._data.oLink,this._data.className);
       $(this._data.oLink).parents('li').addClass('sm2_playing');
+      $('#currently_playing').html( this._data.oLink.innerHTML )
     },
-
+    
     stop: function() {
       pl.removeClass(this._data.oLink,this._data.className);
       this._data.className = '';
@@ -98,7 +99,6 @@ function InlinePlayer() {
       pl.addClass(this._data.oLink,this._data.className);
       $(this._data.oLink).parents('li').removeClass('sm2_paused');
       $(this._data.oLink).parents('li').addClass('sm2_playing');
-      
     },
 
     finish: function() {
@@ -170,7 +170,14 @@ function InlinePlayer() {
        onstop:self.events.stop,
        onpause:self.events.pause,
        onresume:self.events.resume,
-       onfinish:self.events.finish
+       onfinish:self.events.finish,
+       whileplaying:function() {
+         $("#position").html(this.position/this.duration);
+       },
+       onload:function(){
+         $("#duration").html(this.duration);
+         $("#volume").html(this.options.volume);
+        }
       });
       // tack on some custom data
       thisSound._data = {

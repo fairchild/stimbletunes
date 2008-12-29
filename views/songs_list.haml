@@ -3,7 +3,7 @@
   - @songs.each_with_index do |song, i|
     %li
       %span.control_icons
-        %span{:rel=>"/playlist/enque/#{song.id}"} +
+        %span{:class=>'enque_button', :rel=>"/playlist/enque/#{song.id}"} +
       %span{:class=>"playable song", :id=>"song_#{i}"}
         = link_to_song song        
       %span.info
