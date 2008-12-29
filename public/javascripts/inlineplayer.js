@@ -74,27 +74,39 @@ function InlinePlayer() {
       pl.removeClass(this._data.oLink,this._data.className);
       this._data.className = pl.css.sPlaying;
       pl.addClass(this._data.oLink,this._data.className);
+      $(this._data.oLink).parents('li').addClass('sm2_playing');
     },
 
     stop: function() {
       pl.removeClass(this._data.oLink,this._data.className);
       this._data.className = '';
+      $(this._data.oLink).parents('li').removeClass('sm2_playing');
+      $(this._data.oLink).parents('li').removeClass('sm2_paused');
     },
 
     pause: function() {
       pl.removeClass(this._data.oLink,this._data.className);
       this._data.className = pl.css.sPaused;
       pl.addClass(this._data.oLink,this._data.className);
+      $(this._data.oLink).parents('li').removeClass('sm2_playing');
+      $(this._data.oLink).parents('li').addClass('sm2_paused');
     },
 
     resume: function() {
       pl.removeClass(this._data.oLink,this._data.className);
       this._data.className = pl.css.sPlaying;
-      pl.addClass(this._data.oLink,this._data.className);      
+      pl.addClass(this._data.oLink,this._data.className);
+      $(this._data.oLink).parents('li').removeClass('sm2_paused');
+      $(this._data.oLink).parents('li').addClass('sm2_playing');
+      
     },
 
     finish: function() {
       pl.removeClass(this._data.oLink,this._data.className);
+      $(this._data.oLink).parents('li').removeClass('sm2_playing');
+      $(this._data.oLink).parents('li').removeClass('sm2_paused');
+      $(this._data.oLink).parents('li').addClass('sm2_played');
+      
       this._data.className = '';
       if (pl.config.playNext) {
         var nextLink = (pl.indexByURL[this._data.oLink.href]+1);
@@ -135,16 +147,19 @@ function InlinePlayer() {
     sm._writeDebug('handleClick()');
     var soundURL = (o.href);
     var thisSound = self.getSoundByURL(soundURL);
+    console.info("soundURL = %s", soundURL);
+    
     if (thisSound) {
       // already exists
       if (thisSound == self.lastSound) {
         // and was playing (or paused)
-        thisSound.togglePause();
+        thisSound.togglePause();        
       } else {
         // different sound
         thisSound.togglePause(); // start playing current
         sm._writeDebug('sound different than last sound: '+self.lastSound.sID);
-        if (self.lastSound) self.stopSound(self.lastSound);
+        if (self.lastSound) {self.stopSound(self.lastSound);          
+          }
       }
     } else {
       // create sound
@@ -168,6 +183,7 @@ function InlinePlayer() {
       thisSound.play();
       // stop last sound
     }
+    console.log("sound = %o", thisSound);    
 
     self.lastSound = thisSound; // reference for next call
 
