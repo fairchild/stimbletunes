@@ -81,7 +81,28 @@ helpers do
     "<pre>#{pp thing.inspect}</pre>"
   end
   def link_to_song(song)
-    "<a rel=\"/play/#{escape(song.full_path)}\" >#{song}</a>"
+    "<a href=\"/play/#{escape(song.full_path)}\" rel=\"/play/#{escape(song.full_path)}\" >#{song}</a>"
+  end
+  def scan_folder(base_path)
+    puts "SCANNING: #{base_path}"
+    if File.directory?(base_path)
+      Dir.foreach(base_path) do |dir|
+        file_path = File.join(base_path, dir)
+        next if ['.DS_Store', '.', '..'].include?(dir)
+        puts "dir #{File.directory?(file_path)} = #{file_path}"
+        
+        Song.find_or_create_from_file(file_path, true) if File.file?(file_path)
+        if File.directory?(file_path)
+          puts "scan #{file_path}"
+          scan_folder(file_path) 
+        end
+      end
+    else
+      raise "passed an invalid path: #{path}"
+    end
+    # files.each do |file_path|
+    #   Song.find_or_create_from_file(file_path, true) if File.file?(file_path)
+    # end
   end
 end
 
@@ -111,7 +132,6 @@ get '/folders/*' do
   session[:current_directory] = File.join(params['splat'])
   @folders = Dir.glob(File.join(current_library, File.join(folder_path, '/*'))).collect{|d|  File.basename(d) if File.directory?(d)}
   @folders.delete_if{|f| f.nil?}
-  pp @folders 
   @songs = Song.find(:all, :conditions=>["path like ?", File.join(current_library, session[:current_directory]) ])
   haml :folders
 end
@@ -119,19 +139,8 @@ end
 get '/identify/*' do  
   session[:current_directory] = File.join(params['splat'])
   path = File.join(current_library, File.join(params['splat']))
-  # Protecect against requests for files that are outside the library
-  raise SecurityException, "Invalid Path: #{path}" if (path[0...current_library.length] != current_library)
-  if File.file?(path)
-    @folders = [path]
-  elsif File.directory?(path)
-    @folders = Dir.glob(File.join(path, '*'))
-  else
-    raise "passed an invalid path: #{path}"
-  end
-  @folders.each do |file_path|
-    puts "file = #{file_path}" if File.file?(file_path)
-    Song.find_or_create_from_file(file_path, true) if File.file?(file_path)
-  end
+  raise SecurityException, "Invalid Path: #{path[0...current_library.length]}" if !Settings.music_folders.grep(path[0...current_library.length]).blank?
+  scan_folder(path)
   @songs = Song.find(:all, :limit=>50, :conditions=>["path like ?", path+"%"])
   haml :folders
 end
@@ -152,6 +161,7 @@ get '/playlist/enque/:song_id' do
     redirect '/playlist', 303  #use a 303 code to force reset method to GET
   end
 end
+
 get '/playlist/remove/:playlist_song_id' do
   pp request
   @playlist = session[:current_playlist] || Playlist.first
@@ -186,13 +196,12 @@ get '/libraries/*' do
 end
 
 get '/play/*' do
+  # if params[:splat].first.match(/d/)
+  #    song = Song.find(params[:splat].pop)
   song = Song.find_by_full_path( File.join(params['splat']) )
-  song.increment_play_count
+  # song.increment_play_count
   return false if song.blank?
   raise InvalidFile, "Tried to play an invalid file: #{song.full_path}" if !File.file?(song.full_path)
   puts " -> playing: #{song.full_path} ->\n"  
-  # if params[:splat].first.match(/d/)
-  #    song = Song.find(params[:splat].pop)
-  #    send_file song.full_filename
   send_file song.full_path
 end

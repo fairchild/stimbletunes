@@ -20,6 +20,7 @@ class Song < ActiveRecord::Base
   end
   
   def Song.find_or_create_from_file(file_path, update_metadata=false)
+    return nil if %w(.DS_Store . ..).include?(file_path)
     return nil if !File.file?(file_path)
     song = Song.find(:first, :conditions => {:filename=>File.basename(file_path), 
                                              :path => file_path.gsub("/#{File.basename(file_path)}",'')})

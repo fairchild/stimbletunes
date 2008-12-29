@@ -13,6 +13,8 @@
 */
 
 function InlinePlayer() {
+  console.log("this = %o", this);
+  console.dir(this);
   var self = this;
   var pl = this;
   var sm = soundManager; // soundManager instance
