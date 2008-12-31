@@ -139,7 +139,7 @@ end
 get '/identify/*' do  
   session[:current_directory] = File.join(params['splat'])
   path = File.join(current_library, File.join(params['splat']))
-  raise SecurityException, "Invalid Path: #{path[0...current_library.length]}" if !Settings.music_folders.grep(path[0...current_library.length]).blank?
+  #raise SecurityException, "Invalid Path: #{path[0...current_library.length]}" if !Settings.music_folders.grep(path[0...current_library.length]).blank?
   scan_folder(path)
   @songs = Song.find(:all, :limit=>50, :conditions=>["path like ?", path+"%"])
   haml :folders

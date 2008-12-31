@@ -12,6 +12,15 @@
 
 */
 
+function milliseconds_to_minutes(milliseconds){
+  x = milliseconds / 1000;
+  seconds = x % 60;
+  x /= 60;
+  minutes = x % 60;
+  x /= 60;
+  return parseInt(minutes)+":"+parseInt(seconds);
+}
+
 function InlinePlayer() {
   console.log("this = %o", this);
   console.dir(this);
@@ -172,10 +181,10 @@ function InlinePlayer() {
        onresume:self.events.resume,
        onfinish:self.events.finish,
        whileplaying:function() {
-         $("#position").html(this.position/this.duration);
+         $("#position").html(milliseconds_to_minutes(this.position));
        },
        onload:function(){
-         $("#duration").html(this.duration);
+         $("#duration").html(milliseconds_to_minutes(this.duration));
          $("#volume").html(this.options.volume);
         }
       });

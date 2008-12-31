@@ -15,6 +15,11 @@ set :public,   File.expand_path(File.dirname(__FILE__) + '/public')
 set :views,    File.expand_path(File.dirname(__FILE__) + '/views')
 set :env,      :production
 
+log = File.new("sinatra.log", "a")
+STDOUT.reopen(log)
+STDERR.reopen(log)
+
+
 disable :run, :reload
 
 run Sinatra.application
