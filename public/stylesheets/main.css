@@ -1,4 +1,7 @@
-/* @override http://localhost:4567/stylesheets/main.css */
+/* @override 
+	http://localhost:4567/stylesheets/main.css
+	http://192.168.4.10:8600/stylesheets/main.css
+*/
 
 body { 
 font : verdana, tahoma, "Trebuchet MS", arial, sans-serif;
@@ -53,3 +56,59 @@ h1.current_folder {
 	color: #4c4c4c;
 	font-weight: bold;
 }
+
+
+
+div#control_pane{
+	display:block;
+	
+}
+/*div#control_pane div{
+	display: inline-block;
+}*/
+#play_pause_button .playing{
+	background-image: url(/images/play.jpg);
+}
+#play_pause_button .paused{
+	 background-color:#999;
+
+}
+
+
+.sm2_played{
+	opacity: 0.75;
+}
+
+
+.enque_button{
+  width:1.5ex;
+	float: left;
+	display: inline-block;
+	color:white;
+}
+
+.playlist li:hover span.enque_button{
+  color:gray;
+}
+.playlist li:hover span.enque_button:hover{
+  text-decoration:bold;
+}
+div.playable_song{
+	display: inline-block;
+	height: 200px;
+}
+
+.waveform{
+	width: 100%;
+		/*position: absolute;*/
+	/*background-image:url(http://localhost/waveform_css/waveform.png) no-repeat;*/
+}
+
+.waveform_played {
+  display:none;
+	height: 100%;
+	border-right: 2px solid black;
+	position: absolute;
+	background-color: #99ccff;
+}
+

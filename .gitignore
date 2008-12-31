@@ -1,6 +1,10 @@
+._*
+.DS_Store
 db/*db
 db/*sqlite?
 log/*
 trash/
 .DS_Store
 /settings.rb
+/tmp/*
+sinatra.log

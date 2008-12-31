@@ -10,8 +10,9 @@
   %div{:id=>"play_pause_button", :class=>'paused'} play
   %div{:id=>"currently_playing"} currently playing song
   %div{:id=>"volume"} volume
-  %div{:id=>'position'} position
-  %div{:id=>'duration'} duration
+  %span{:id=>'position'} position
+  = " / "
+  %span{:id=>'duration'} duration
   
   
 - if !@folders.blank?

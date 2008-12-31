@@ -2,12 +2,13 @@
 %ul{:class=>'playlist songs_list'}
   - @songs.each_with_index do |song, i|
     %li
-      %span.control_icons
+      %span
         %span{:class=>'enque_button', :rel=>"/playlist/enque/#{song.id}"} +
-      %span{:class=>"playable song", :id=>"song_#{i}"}
-        = link_to_song song        
-      %span.info
-        %span.artist= song.artist
-        %span.album= song.album
-      %span.position
-      %span.duration
+      %div{:class=>"playable song waveform", :id=>"song_#{i}"}
+        %span.waveform_played
+        = link_to_song song
+        %span.info
+          %span.artist= song.artist
+          %span.album= song.album
+        %span.position
+        %span.duration
