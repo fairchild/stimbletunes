@@ -69,7 +69,7 @@ helpers do
     stop [ 401, 'Not authorized' ] unless admin?
   end
   def current_library
-    session[:current_library] || Settings.music_folders.last
+    session[:current_library] ? session[:current_library] : session[:current_library] = Settings.music_folders.last
   end
   def song_file_path(folder, filename)
     File.join(current_library, folder, filename)
@@ -83,6 +83,8 @@ helpers do
   def link_to_song(song)
     "<a href=\"/play/#{escape(song.full_path)}\" rel=\"/play/#{escape(song.full_path)}\" >#{song}</a>"
   end
+  
+  # Recursivley scan folder for media files, parsing meta data and inserting in database along the way
   def scan_folder(base_path)
     puts "SCANNING: #{base_path}"
     if File.directory?(base_path)
@@ -107,7 +109,6 @@ helpers do
 end
 
 
-
 get '/' do
   @folders = Dir.glob(current_library+'/*').collect{|d| File.basename d}
   session[:current_directory]  = '/'
@@ -128,18 +129,19 @@ end
 
 get '/folders/*' do
   folder_path = File.join(params['splat'])
-  # raise InvalidFile, "Tried to display an invalid folder: #{folder_path}" if !File.exists?(full_path(folder_path))
+  full_path = File.join(current_library, folder_path)
+  raise InvalidFile, "Tried to display an invalid folder: #{folder_path}" if !File.exists?(full_path)
   session[:current_directory] = File.join(params['splat'])
-  @folders = Dir.glob(File.join(current_library, File.join(folder_path, '/*'))).collect{|d|  File.basename(d) if File.directory?(d)}
+  @folders = Dir.glob(File.join(full_path, '/*')).collect{|d|  File.basename(d) if File.directory?(d)}
   @folders.delete_if{|f| f.nil?}
-  @songs = Song.find(:all, :conditions=>["path like ?", File.join(current_library, session[:current_directory]) ])
+  @songs = Song.find(:all, :conditions=>["path like ?", File.join(current_library, session[:current_directory]) ], :limit=>100)
   haml :folders
 end
 
 get '/identify/*' do  
   session[:current_directory] = File.join(params['splat'])
   path = File.join(current_library, File.join(params['splat']))
-  #raise SecurityException, "Invalid Path: #{path[0...current_library.length]}" if !Settings.music_folders.grep(path[0...current_library.length]).blank?
+  raise SecurityException, "Invalid Path: #{path[0...current_library.length]}\n #{Settings.music_folders.inspect}" if Settings.music_folders.grep(/#{path[0...current_library.length]}/).blank?
   scan_folder(path)
   @songs = Song.find(:all, :limit=>50, :conditions=>["path like ?", path+"%"])
   haml :folders
