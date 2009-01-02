@@ -105,7 +105,7 @@ class Song < ActiveRecord::Base
   def parse_flac
     # require 'flacinfo'
     flac = FlacInfo.new(full_path)
-    year = flac.tags['date'] || flac.tag['year']
+    year = flac.tags['date'] || flac.tags['year']
     {
       :artist => flac.tags['artist'],
       :title  => flac.tags['title'],

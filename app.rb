@@ -96,7 +96,7 @@ helpers do
         Song.find_or_create_from_file(file_path, true) if File.file?(file_path)
         if File.directory?(file_path)
           puts "scan #{file_path}"
-          scan_folder(file_path) 
+          scan_folder(file_path)
         end
       end
     else
@@ -120,11 +120,11 @@ get '/login' do
 end
 post '/login' do
   set_cookie(Settings.admin_cookie_key, Settings.admin_cookie_value) if params[:password] == Settings.admin_password
-	redirect '/'	
+  redirect '/'
 end
 get '/logout' do
   request.cookies[Settings.admin_cookie_key] = nil
-	redirect '/login'	
+  redirect '/login'
 end
 
 get '/folders/*' do
@@ -138,7 +138,7 @@ get '/folders/*' do
   haml :folders
 end
 
-get '/identify/*' do  
+get '/identify/*' do
   session[:current_directory] = File.join(params['splat'])
   path = File.join(current_library, File.join(params['splat']))
   raise SecurityException, "Invalid Path: #{path[0...current_library.length]}\n #{Settings.music_folders.inspect}" if Settings.music_folders.grep(/#{path[0...current_library.length]}/).blank?
@@ -166,19 +166,31 @@ end
 
 get '/playlist/remove/:playlist_song_id' do
   pp request
+  PlaylistSong.delete(params[:playlist_song_id])
   @playlist = session[:current_playlist] || Playlist.first
-  @playlist.songs.delete(@playlist.songs.find(params[:playlist_song_id]))
+  # @playlist.playlist_songs.delete(PlaylistSong.find(params[:playlist_song_id]))
   if request.xhr?
     @playlist.songs.size
     puts "it was xhr"
   else
-    puts "file removed, not thru ajax"
+    puts "song removed, not thru ajax"
     # redirect '/playlist'  #use a 303 code to force reset method to GET
   end
 end
 
+put "/playlist/reorder/" do
+  # TODO
+  pp params
+  playlist = Playlist.find(session[:playlist_id])
+  playlist_song = playlist_song.playlist_songs.find(params[:middle])
+  # playlist.insert_song_at_position(song, params[:position])
+  puts "reordering playlist " #todo
+  playlist
+end
+
 get '/playlist' do
-  @playlist = Playlist.first
+  @playlist = Playlist.first || Playlist.create
+  session[:playlist_id] = @playlist.id
   haml :playlist # :layout => :playlist_layout
 end
 

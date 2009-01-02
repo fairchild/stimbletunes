@@ -1,9 +1,9 @@
 %ul{:class=>'playlist'}
-  - @playlist.songs.each do |song|
-    %li
+  - @playlist.playlist_songs.each do |playlist_song|
+    %li{:id=>"playlist_song_#{playlist_song.id}"}
       %span.control_icons
-        %a{:rel=>"/playlist/remove/#{song.id}", :class=>"playlist_remove"} -
-      %span{:class=>"playable song"}= link_to_song song
+        %a{:href=>"/playlist/remove/#{playlist_song.id}", :class=>"playlist_remove"} -
+      %span{:class=>"playable song"}= link_to_song playlist_song.song
       %span.info
-        %span.artist= song.artist
-        %span.album= song.album
+        %span.artist= playlist_song.song.artist
+        %span.album= playlist_song.song.album
