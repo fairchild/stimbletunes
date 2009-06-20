@@ -1,3 +1,3 @@
-module Sinatratune
+module Sinatratunes
   
 end

@@ -54,7 +54,7 @@ class Song < ActiveRecord::Base
   end
 
   def Song.earworm
-    @ew = Earworm::Client.new(Settings.music_dns_api_key)
+    @ew = Earworm::Client.new(Settings[:music_dns_api_key])
   end
   def earworm
     @ear = @ear || Song.earworm.identify( :file => self.full_path )
@@ -90,12 +90,12 @@ class Song < ActiveRecord::Base
         # require 'id3lib'
         tag = ID3Lib::Tag.new(full_path)
         {
-          :artist  => tag.artist,
+          :artist => tag.artist,
           :title  => tag.title,
           :album  => tag.album,
           :track  => tag.track, #[/^(\d+)/]
           :genre  => tag.genre,
-          :year  => tag.year
+          :year   => tag.year
         }
   end
   def id3
